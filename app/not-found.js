@@ -28,7 +28,7 @@ export default function NotFound() {
       </Typography>
 
       <Typography variant="body1" sx={{ mb: 4, maxWidth: 400, color: '#666' }}>
-        The page you're looking for doesn't exist or has been moved.
+          This page doesn&apos;t exist exist or has been moved.
       </Typography>
 
       <Button
