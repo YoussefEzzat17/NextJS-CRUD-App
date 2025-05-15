@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import ProductCard from '../app/Components/ProductCard';
 import Link from 'next/link';
 import styles from './Styles/home.module.css';
@@ -13,6 +13,7 @@ export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
 
   useEffect(() => {
     fetch('/api/products')
@@ -32,13 +33,28 @@ export default function HomePage() {
       });
   }, []);
 
-  const handleDelete = async (id) => {
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+
+  //useCallback 
+  const handleDelete = useCallback(async (id) => {
     await fetch(`/api/products/${id}`, { method: 'DELETE' });
     setProducts(prev => prev.filter(p => p.id !== id));
-  };
+  }, []);
 
-  const filteredProducts = products.filter((product) =>
-    product.title.toLowerCase().includes(searchQuery.toLowerCase())
+
+  //useMemo for filtered products
+  const filteredProducts = useMemo(() => 
+    products.filter((product) =>
+      product.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+    ),
+    [products, debouncedSearchQuery]
   );
 
   return (
